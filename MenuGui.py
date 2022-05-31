@@ -23,7 +23,6 @@ class Table(tk.Frame):
         read_conf_param = Conf_pars.read_con_file(dir_path)
         columns = ('Nickname','Corporation','Alliance','Sec status','Ship Kill','Solo Kill','Ship Lost','Gang Ratio')
         self.table =  ttk.Treeview(self, columns = columns, show='headings')
-        self.img = tk.PhotoImage(file = 'D:\\Work\\Project Python\\Killborda\\22852_32.png')
         for col in columns:
             self.table.heading(col,text=col,command=lambda c=col: self.treeview_sort_column(self.table, c,True))
             self.table.column(col,width=120)
@@ -65,6 +64,7 @@ class Table(tk.Frame):
         self.label_info = tk.Label(self,text = "XXXXXX",height = 2)
         self.label_info.pack( side='bottom')
         self.click_timer = 0
+
 
     def check_param(self,*args):
         if args[0] == 'True':
@@ -248,7 +248,7 @@ class Table(tk.Frame):
         print("start_filter")
         filt_window = tk.Toplevel(self,padx = 10, pady = 10)
         filt_window.title("Filter Account")
-        filt_window.geometry("550x470")
+        filt_window.geometry("560x460")
         filt_window.lift(aboveThis=self)
         filt_window.bind("<Key>", self._onKeyRelease_filt, "+")
         filt_window.resizable(width=False, height=False)
@@ -256,6 +256,7 @@ class Table(tk.Frame):
         filt_window.focus_set()
         filt_window.grab_set()
         frame_filter_insert_nick = tk.Frame(filt_window)
+        frame_filter_text_info = tk.Frame(filt_window)
         frame_filter_user_nick = tk.Frame(filt_window)
         frame_filter_general_nick = tk.Frame(filt_window)
 
@@ -278,14 +279,16 @@ class Table(tk.Frame):
         s_general_acc_filter = tk.Scrollbar(frame_filter_general_nick,orient= 'vertical',command= self.list_box_nick.yview)
         self.list_box_nick['yscrollcommand'] = s_general_acc_filter.set
 
-        label_image1 = tk.Label(filt_window,height = 150,width = 200)
-        label_image1.img = tk.PhotoImage(file = r'..\imgonline-com-ua-Resize-wZMJpcQwrph.png')
-        label_image1['text'] = "Lena png"
-        label_image1['image'] = label_image1.img
 
+        label_txt_img = tk.Label(frame_filter_text_info,height = 11,width = 28, font="Arial 12")
+        label_txt_img['text'] = """General filter\n You can add all the nicknames \n of the players you need to this filter,
+          for example, the players of the \n current fleet.\n
+        User character filter(my acc).\n Removes the desired characters
+        from the general filter, so as not
+        to add them several times."""
         label_filt_window.grid(column = 0, row = 0 ,padx = 5, pady = 2)
         self.text_enter_filt_window.grid(column = 0, row =1,padx = 5, pady = 5)
-        label_image1.grid(column =1, row = 1)
+        label_txt_img.grid(column = 0, row = 0)
         button_enter_filt_window.grid(column = 0, row =2,padx = 5, pady = 2)
         button_add_u_acc_filt_window.grid(column = 0, row =3,padx = 5, pady = 2)
         button_clear_filt_window.grid(column=0,row=6,padx = 5, pady = 2)
@@ -299,6 +302,7 @@ class Table(tk.Frame):
         button_clear_u_acc_filt_window.grid(column =0 , row = 2,padx = 5, pady = 2)
 
         frame_filter_insert_nick.grid(column = 0, row =1,padx = 5, pady = 2)
+        frame_filter_text_info.grid(column = 1, row =1,padx = 5, pady = 2)
         frame_filter_user_nick.grid(column = 1, row =5,padx = 5, pady = 2)
         frame_filter_general_nick.grid(column = 0, row =5,padx = 5, pady = 2)
 
