@@ -176,7 +176,7 @@ class Table(tk.Frame):
             self.enterclipboard()
 
     def thread_listener(self):
-        self.thread_list = Thread(target = self.copy_keylis,name = "key_listener")
+        self.thread_list = Thread(target = self.copy_keylis,name = "key_listener",daemon = True)
         self.thread_list.start()
 
     def copy_keylis(self):
@@ -186,13 +186,13 @@ class Table(tk.Frame):
                 listener.join()
         else:
             print(threading.active_count())
-            print("enumera  te: ", threading.enumerate())
+            print("enumerate: ", threading.enumerate())
             print("Return False")
             return False
 
     def listener_press(self,key):
-        time.sleep(0.1)
-        print(key)
+        time.sleep(0.02)
+        print("Key", key)
         try:
             if self.thread_l_flag.get():
                 if str(key) == r"'\x03'":
@@ -202,7 +202,7 @@ class Table(tk.Frame):
             else:
                 return False
         except Exception as e:
-            print(e.args[0])
+            print("Listener except ", e.args[0])
 
     def enterdatatable(self,user_pl):
         #insert in table
@@ -384,16 +384,27 @@ class Table(tk.Frame):
         self.get_data_for_u_acc_filter()
 
     def quit(self):
-        value = []
-        value.append(self.show_top.get())
-        value.append(self.thread_l_flag.get())
-        print(value)
-        self.thread_l_flag = True
-        print(threading.active_count())
-        print("enumerate: ", threading.enumerate())
+        try:
+            value = []
+            print("Out thread flag ", self.show_top.get())
+            print("Out thread flag ", self.thread_l_flag.get())
+            value.append(self.show_top.get())
+            value.append(self.thread_l_flag.get())
+            print(value)
+            self.thread_l_flag.set("False")
+            print(threading.active_count())
+            print("enumerate: ", threading.enumerate())
+
+
+
+
+        except Exception as e:
+            print("Error, can't get data for_u_acc_filter ",e.args[0])
+
         path = "%s\\WhoIsHere\\" %os.environ['APPDATA']
         Conf_pars.save_config_file(path,value)
         i = 0
+
         for i in range(5):
             print("До выхода: ", i - 5)
         root.destroy()
