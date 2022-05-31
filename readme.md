@@ -29,4 +29,4 @@ You can create 2 filters:
 If you are an eve online player and want to thank me for my work. You can transfer my claims to the game nickname Eve Online - Molb Sinulf
 
 ### Last version
-[V1_2](Builds/v1_2)
+[V1_2](https://downgit.github.io/#/home?url=https://github.com/labartem/WhoIsHere/blob/main/Builds/v1_2/MenuGui.exe)
