@@ -1,7 +1,7 @@
 import configparser
 import os
 
-
+# Work with config file
 def create_conf_file(path):
     config = configparser.ConfigParser()
     config.add_section('APP')

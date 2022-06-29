@@ -1,5 +1,4 @@
 import clipboard
-import Esi
 import time
 import User_base
 import Conf_pars
@@ -18,6 +17,7 @@ import os
 class Table(tk.Frame):
     def __init__(self, parent=None, rows=tuple()):
         super().__init__(parent)
+        # Create Main window
         print("start table")
         dir_path = "%s\\WhoIsHere\\" %os.environ['APPDATA']
         read_conf_param = Conf_pars.read_con_file(dir_path)
@@ -92,11 +92,13 @@ class Table(tk.Frame):
         self.table.bind('<ButtonRelease-1>',self.stop_motor)
 
     def start_motor(self,event):
+        # Start timer
         self.click_timer = time.time()
         print(time.ctime(self.click_timer), " start ")
         print("start", '{0:.2f}'.format(self.click_timer))
 
     def stop_motor(self,event):
+        # Stop timer
         self.click_timer = time.time() - self.click_timer
         print('{0:.2f}'.format(self.click_timer), " stop")
         if self.click_timer > 2:
@@ -113,7 +115,6 @@ class Table(tk.Frame):
             self.label_info['text'] = "Copied"
             print("self.VIBOR: ",self.click_timer, " Skopirovano")
             self.click_timer = 0
-
             time.sleep(1)
             self.c.delete("all")
         self.c.delete("all")
@@ -125,7 +126,6 @@ class Table(tk.Frame):
 
     def treeview_sort_column(self,table, col,reverse):
         l = [(self.table.set(k, col),  k) for k in self.table.get_children()]
-
         if col == "Ship Kill" or col == "Solo Kill" or col == "Ship Lost" or col == "Gang Ratio":
             l.sort(key=lambda t: int(t[0]),reverse=reverse)
         elif col == "Sec status":
@@ -138,11 +138,10 @@ class Table(tk.Frame):
         self.table.heading(col, command=lambda:
                            self.treeview_sort_column(self.table, col, not reverse))
 
-    def enterclipboard(self,event = 0): #
+    def enterclipboard(self,event = 0):
         # Insert information about  users from clipboard
         print("Insert")
         user_pl= []
-
         for i in clipboard.paste().splitlines():
             user_pl.append(i.strip())
         print("V Copy ", user_pl)
@@ -205,7 +204,7 @@ class Table(tk.Frame):
             print("Listener except ", e.args[0])
 
     def enterdatatable(self,user_pl):
-        #insert in table
+        # Insert in table
         print("data ", user_pl)
         i = 0
         b = []
@@ -243,7 +242,7 @@ class Table(tk.Frame):
         self.label_info.configure(text = end_time)
 
     def filter_window(self):
-        ##create window fot filter player
+        # Create window fot filter player
         self.flag = 1
         print("start_filter")
         filt_window = tk.Toplevel(self,padx = 10, pady = 10)
@@ -334,7 +333,7 @@ class Table(tk.Frame):
                 try:
                     self.list_box_nick.insert('end',l_u_data[i][0])
                 except Exception as e:
-                    print("Error, can't get data for_filter ",e)
+                    print("Error, can't get data for_filter ",e.args[0])
                 j += 1
             return l_u_data
 
@@ -350,7 +349,7 @@ class Table(tk.Frame):
                 try:
                     self.list_box_user_acc_nick.insert('end',l_u_data[i][0])
                 except Exception as e:
-                    print("Error, can't get data for_u_acc_filter ",e)
+                    print("Error, can't get data for_u_acc_filter ",e.args[0])
                 j += 1
             return l_u_data
 
@@ -394,9 +393,6 @@ class Table(tk.Frame):
             self.thread_l_flag.set("False")
             print(threading.active_count())
             print("enumerate: ", threading.enumerate())
-
-
-
 
         except Exception as e:
             print("Error, can't get data for_u_acc_filter ",e.args[0])
@@ -462,10 +458,8 @@ def check_exist_file():
 if __name__ == "__main__":
     check_exist_file()
     root = tk.Tk()
-    # root.lift()
     root.title(u'WhoIsHere')
     z = [('Insert data',' Ctrl + V',' Please OFF',' Caps Lock ',"Created by","Molb Sinulf") ]
-    # root.tkraise()
     table = Table(root,  rows=z)
     root.protocol("WM_DELETE_WINDOW", table.quit)
     root.bind("<Key>", table._onKeyRelease, "+")
