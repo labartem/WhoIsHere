@@ -12,14 +12,19 @@ from threading import Thread
 from pynput import keyboard
 import threading
 import os
+import webbrowser
 
+
+def get_need_directory():
+    # Get user Documents directory
+    return "%s\\WhoIsHere\\" %os.path.expanduser('~\Documents')
 
 class Table(tk.Frame):
     def __init__(self, parent=None, rows=tuple()):
         super().__init__(parent)
         # Create Main window
         print("start table")
-        dir_path = "%s\\WhoIsHere\\" %os.environ['APPDATA']
+        dir_path = get_need_directory()
         read_conf_param = Conf_pars.read_con_file(dir_path)
         columns = ('Nickname','Corporation','Alliance','Sec status','Ship Kill','Solo Kill','Ship Lost','Gang Ratio')
         self.table =  ttk.Treeview(self, columns = columns, show='headings')
@@ -54,6 +59,7 @@ class Table(tk.Frame):
         scrolltable.pack(side=tk.RIGHT, fill=tk.Y)
         self.table.pack(expand=tk.YES, fill=tk.BOTH)
         self.c = Canvas(self,width =30,height =30,bg= "white")
+
         self.button_input = tk.Button(self,text="Input",width = 10,height =2,fg = "black", command = self.enterclipboard)
         self.button_stop = tk.Button(self,text="Stop",width = 10,height =2,fg = "black", command = self.stop_inter_threadself)
         hidden_scale = tk.Scale(self,orient = "horizontal", from_ = 100, to = 20 ,command = self.change_transparency,showvalue = 0)
@@ -64,7 +70,6 @@ class Table(tk.Frame):
         self.label_info = tk.Label(self,text = "XXXXXX",height = 2)
         self.label_info.pack( side='bottom')
         self.click_timer = 0
-
 
     def check_param(self,*args):
         if args[0] == 'True':
@@ -86,38 +91,51 @@ class Table(tk.Frame):
             root.wm_attributes("-topmost", False)
 
     def on_tree_select(self,event):
-        self.c.create_oval(3,3,30,30,fill = "red")
         self.c.update()
         self.table.bind('<ButtonPress-1>', self.start_motor )
         self.table.bind('<ButtonRelease-1>',self.stop_motor)
 
     def start_motor(self,event):
         # Start timer
+        DELAY = 56
+        ext = 0
+        x = self.c.create_arc(3, 3, 30, 30,start=0, extent=ext,fill='red')
         self.click_timer = time.time()
         print(time.ctime(self.click_timer), " start ")
         print("start", '{0:.2f}'.format(self.click_timer))
+        root.after(DELAY,self.circle_animation,x,ext,DELAY)
+
 
     def stop_motor(self,event):
         # Stop timer
         self.click_timer = time.time() - self.click_timer
         print('{0:.2f}'.format(self.click_timer), " stop")
-        if self.click_timer > 2:
-            print('Select item: ')
-            try:
-                url = User_base.user_url_req(self.table.item(self.table.selection())['values'][0])
-            except Exception as e:
-                url = "https://zkillboard.com/"
-                print("Error zkillboard copy  ", e.args[0])
-
-            clipboard.copy(url)
-            self.c.create_oval(3,3,30,30,fill = "green")
-            self.c.update()
-            self.label_info['text'] = "Copied"
-            print("self.VIBOR: ",self.click_timer, " Skopirovano")
-            self.click_timer = 0
-            time.sleep(1)
-            self.c.delete("all")
+        ext = 0
+        time.sleep(1)
         self.c.delete("all")
+
+    def circle_animation(self,id,ext,DELAY):
+        # Create animation for coppy
+        if ext != 360:
+            ext += 10
+            self.c.itemconfig(id,start=0,extent=-ext)
+            self.c.after(DELAY,self.circle_animation,id,ext,DELAY)
+        else:
+                try:
+                    url = User_base.user_url_req(self.table.item(self.table.selection())['values'][0])
+                except Exception as e:
+                    url = "https://zkillboard.com/"
+                    print("Error zkillboard copy  ", e.args[0])
+
+                # Open URL in a new tab, if a browser window is already open.
+                webbrowser.open_new_tab(url)
+
+                self.c.create_oval(3,3,30,30,fill = "green")
+                self.c.update()
+                self.label_info['text'] = "Zkb Open"
+                print("self.VIBOR: ",self.click_timer, " Skopirovano")
+                self.click_timer = 0
+                print("END")
 
     def the_choice_column(self,event):
         if self.table.identify_region(event.x,event.y) == "heading" :
@@ -356,25 +374,16 @@ class Table(tk.Frame):
     def copy_list(self):
         self.list_box_nick.delete(0,'end')
         x =  self.text_enter_filt_window.get('1.0','end' ).split("\n")
-        print("ДО ", x)
         x = list(filter(None,x))
-        print("После", x)
-        print("y", x)
         x = User_base.search_nicknames_in_filter(x)
-        print("Ретурн ", x)
         User_base.insert_nick_in_filter(x)
         self.get_data_for_filter()
 
     def add_u_acc_filter(self):
         x =  self.text_enter_filt_window.get('1.0','end' ).split("\n")
-        print("ДО ", x)
         x = list(filter(None,x))
-        print("После", x)
-        print("y", x)
         x = User_base.search_nicknames_in_filter_user_acc(x)
-        print("Ретурн ", x)
         x = User_base.search_nicknames_in_filter_for_add_user_acc(x)
-        print("Xxxxx2 ", x)
         User_base.insert_nick_in_filter_user_acc(x)
 
         self.list_box_nick.delete(0,'end')
@@ -396,14 +405,21 @@ class Table(tk.Frame):
 
         except Exception as e:
             print("Error, can't get data for_u_acc_filter ",e.args[0])
+        try:
+            path =  get_need_directory()
+            Conf_pars.save_config_file(path,value)
 
-        path = "%s\\WhoIsHere\\" %os.environ['APPDATA']
-        Conf_pars.save_config_file(path,value)
-        i = 0
+        except Exception as e:
+                print("Error with access to user Documents ",e.args[0])
+        finally:
+            i = 0
 
-        for i in range(5):
-            print("До выхода: ", i - 5)
-        root.destroy()
+            for i in range(5):
+                print("Left before exit: ", i - 5)
+            root.destroy()
+
+
+
 
     def about_window(self):
         print("About")
@@ -445,18 +461,28 @@ class Table(tk.Frame):
         label_about.grid(column = 1,row = 1,padx=2,pady=2)
 
 def check_exist_file():
-    dir_path = "%s\\WhoIsHere\\" %os.environ['APPDATA']
+    print("1")
+    dir_path =  get_need_directory()
+    print(dir_path)
     if not os.path.exists(dir_path):
+        print("Папки нет")
         os.makedirs(dir_path)
     if not os.path.exists(dir_path+"file_config.ini"):
+        print("Нет конфига")
         Conf_pars.create_conf_file(dir_path)
     else:
         print("File create")
+    User_base.connect_db()
     User_base.create_db()
 
 
 if __name__ == "__main__":
-    check_exist_file()
+    try:
+        check_exist_file()
+    except Exception as e:
+        print("Error during initialization : " , e.args[0])
+
+
     root = tk.Tk()
     root.title(u'WhoIsHere')
     z = [('Insert data',' Ctrl + V',' Please OFF',' Caps Lock ',"Created by","Molb Sinulf") ]

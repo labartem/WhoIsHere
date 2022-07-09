@@ -1,2 +1,4 @@
 /__pycache__
 Build.py
+/build
+ git commit -m 'fix bug with Db and Config create files, add open zkb profile in default browser,add animtaion open, delete unusable code

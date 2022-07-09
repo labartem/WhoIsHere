@@ -4,11 +4,12 @@ import time
 import Esi
 import Killboard
 import os
-
 # Creating a sqlite3 database and working with it
 
-dir_path = "%s\\WhoIsHere\\user_data.db" %os.environ['APPDATA']
-conn = sqlite3.connect(dir_path,check_same_thread=False)
+def connect_db():
+    dir_path = "%s\\WhoIsHere\\user_data.db" %os.path.expanduser('~\Documents')
+    global conn
+    conn = sqlite3.connect(dir_path,check_same_thread=False)
 
 def create_db():
     cursor = conn.cursor()
